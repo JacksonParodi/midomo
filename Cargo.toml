@@ -1,0 +1,9 @@
+[package]
+name = "midomo"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+enigo = "0.2.1"
+ratatui = "0.28.1"
+sysinfo = "0.32.0"

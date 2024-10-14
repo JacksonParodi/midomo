@@ -7,6 +7,7 @@ use ratatui::{
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
         ExecutableCommand,
     },
+    style::{Style, Stylize},
     widgets::{Block, Paragraph},
     Frame, Terminal,
 };
@@ -58,6 +59,7 @@ fn handle_events() -> io::Result<bool> {
 fn ui(frame: &mut Frame, midomo: &Midomo) {
     frame.render_widget(
         Paragraph::new(midomo.system.used_memory().to_string())
+            .style(Style::default().red().on_light_blue())
             .block(Block::bordered().title("Greeting")),
         frame.area(),
     );

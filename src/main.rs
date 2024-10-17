@@ -1,5 +1,7 @@
 use std::io::{self, stdout};
 
+use midir::{Ignore, MidiInput, MidiOutput};
+
 use ratatui::{
     backend::CrosstermBackend,
     crossterm::{
@@ -15,13 +17,23 @@ use sysinfo::{Components, Disks, Networks, System};
 
 struct Midomo {
     system: System,
+    midi_in: MidiInput,
+    midi_out: MidiOutput,
 }
 
 impl Midomo {
     fn new() -> Self {
-        Midomo {
+        let mut midomo = Midomo {
             system: System::new_all(),
-        }
+            midi_in: MidiInput::new("midomo MIDI input").unwrap(),
+            midi_out: MidiOutput::new("midomo MIDI output").unwrap(),
+        };
+
+        midomo.midi_in.ignore(Ignore::None);
+
+        midomo.system.refresh_all();
+
+        return midomo;
     }
 }
 
@@ -30,8 +42,7 @@ fn main() -> io::Result<()> {
     stdout().execute(EnterAlternateScreen)?;
     let mut terminal = Terminal::new(CrosstermBackend::new(stdout()))?;
 
-    let mut midomo = Midomo::new();
-    midomo.system.refresh_all();
+    let midomo = Midomo::new();
 
     let mut should_quit = false;
     while !should_quit {
@@ -56,9 +67,18 @@ fn handle_events() -> io::Result<bool> {
 }
 
 fn ui(frame: &mut Frame, midomo: &Midomo) {
+    let mut midi_in_ports = String::new();
+
+    for (i, p) in midomo.midi_in.ports().iter().enumerate() {
+        midi_in_ports.push_str(&format!(
+            "{}: {}\n",
+            i,
+            midomo.midi_in.port_name(p).unwrap()
+        ));
+    }
+
     frame.render_widget(
-        Paragraph::new(midomo.system.used_memory().to_string())
-            .block(Block::bordered().title("Greeting")),
+        Paragraph::new(midi_in_ports).block(Block::bordered().title("midomo")),
         frame.area(),
     );
 }

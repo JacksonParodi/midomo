@@ -9,6 +9,7 @@ use ratatui::{
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
         ExecutableCommand,
     },
+    style::{Style, Stylize},
     widgets::{Block, Paragraph},
     Frame, Terminal,
 };

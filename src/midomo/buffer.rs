@@ -20,15 +20,7 @@ impl<T> RingBuffer<T> {
         self.buffer.push_back(value);
     }
 
-    pub fn get(&self, index: usize) -> Option<&T> {
-        self.buffer.get(index)
-    }
-
     pub fn get_back(&self) -> Option<&T> {
         self.buffer.back()
-    }
-
-    pub fn len(&self) -> usize {
-        self.buffer.len()
     }
 }

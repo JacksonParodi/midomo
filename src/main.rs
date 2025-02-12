@@ -5,9 +5,6 @@ use midomo::buffer::RingBuffer;
 use midomo::data::MidomoData;
 
 use std::io::{self, stdout};
-use std::sync::{Arc, Mutex};
-
-use midir::{Ignore, MidiInput, MidiInputConnection, MidiInputPort, MidiOutput};
 
 use ratatui::{
     backend::CrosstermBackend,
@@ -16,18 +13,9 @@ use ratatui::{
         terminal::{disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen},
         ExecutableCommand,
     },
-    style::{Style, Stylize},
     widgets::{Block, Paragraph},
     Frame, Terminal,
 };
-
-use enigo::{
-    Button, Coordinate,
-    Direction::{Click, Press, Release},
-    Enigo, Key, Keyboard, Mouse, Settings,
-};
-
-use sysinfo::{Components, Disks, Networks, System};
 
 fn main() -> io::Result<()> {
     enable_raw_mode()?;
@@ -47,9 +35,9 @@ fn main() -> io::Result<()> {
     Ok(())
 }
 
-fn handle_events(m_data: &mut MidomoData) -> io::Result<bool> {
+fn handle_events(_m_data: &mut MidomoData) -> io::Result<bool> {
     // let last_msg = m_data.last_msg.lock().unwrap();
-    let enigo = m_data.get_enigo();
+    // let enigo = m_data.get_enigo();
 
     // if last_msg[0] == 144 {
     //     match last_msg[1] {
@@ -81,18 +69,14 @@ fn handle_events(m_data: &mut MidomoData) -> io::Result<bool> {
 }
 
 fn ui(frame: &mut Frame, m_data: &MidomoData) {
-    // let last_msg = m_data.last_msg.lock().unwrap();
-    // let display_text = format!("MIDI message : {:?}", last_msg);
     let clone = m_data.get_buffer();
     let buf = clone.lock().unwrap();
     let last = buf.get_back();
 
-    let mut test_text = String::from("MIDI message : ");
-    if last.is_some() {
-        test_text.push_str(&format!("{:?}", last.unwrap()));
-    } else {
-        test_text.push_str("None");
-    }
+    let test_text = match last {
+        Some(msg) => msg.to_string(),
+        None => String::from("MIDI message : None"),
+    };
 
     frame.render_widget(
         Paragraph::new(test_text).block(Block::bordered().title("midomo")),
